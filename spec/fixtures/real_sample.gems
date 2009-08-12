@@ -1,0 +1,4 @@
+group(:default) do |g|
+  g.add('rails')
+  g.add('markbates-configatron', :source => 'http://gems.github.com')
+end

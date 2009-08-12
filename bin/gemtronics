@@ -1,0 +1,100 @@
+#!/opt/local/bin/ruby
+command_message = %{
+Available commands:
+  - install <group> <path> # Specify the group of gems to install. The default is 'default' You must all specify the path to the gemtronics file you wish to install from. The default is 'config/gemtronics.rb'
+  - generate <path> # Specify where you would like the gemtronics file generated. The default 'config/gemtronics.rb'
+  - convert <path> # Convert an existing Gemtools yml file to Gemtronics. The default is 'config/gems.yml'
+}.strip
+
+command = ARGV[0]
+if command.nil?
+  puts %{
+You MUST specify a command!
+
+#{command_message}
+  }.strip
+  exit(-1)
+end
+
+require 'rubygems'
+require 'gemtronics'
+require 'fileutils'
+require 'yaml'
+
+case command
+when 'install'
+  path = ARGV[2] || File.join('config', 'gemtronics.rb')
+  Gemtronics.load(path)
+  Gemtronics.install_gems(ARGV[1] || 'default')
+when 'generate'
+  path = ARGV[1] || 'config'
+  FileUtils.mkdir_p(path)
+  File.open(File.join(path, 'gemtronics.rb'), 'w') do |f|
+    f.puts %{
+group(:default) do |g|
+  # g.add('gem name here')
+  # g.add('gem name here', :version => '1.2.3')
+  # g.add('gem name here', :version => '1.2.3', :source => 'http://gems.example.com')
+  # g.add('gem name here', :version => '1.2.3', :source => 'http://gems.example.com', :require => ['file1', 'file2'])
+end
+
+group(:production, :dependencies => :default) do |g|
+  
+end
+
+group(:development, :dependencies => :default) do |g|
+  
+end
+
+group(:test, :dependencies => :development) do |g|
+  
+end
+    }.strip
+  end
+when 'convert'
+  path = ARGV[1] || File.join('config', 'gems.yml')
+  path = File.join(path, 'gems.yml') unless path.match(/gems.yml$/)
+  gem_list = YAML.load(File.read(path))
+  top_options = {}
+  gems = []
+  gem_list.each do |key, value|
+    if key == 'gems'
+      gems = value
+    else
+      top_options[key.to_sym] = value
+    end
+  end
+  
+  out_path = path.gsub('gems.yml', 'gemtronics.rb')
+  File.open(out_path, 'w') do |f|
+    unless top_options.empty?
+      f.puts "group(:default, #{top_options.inspect.gsub('=>', ' => ')}) do |g|"
+    else
+      f.puts "group(:default) do |g|"
+    end
+  
+    gems.each do |gemdef|
+      x = "  g.add('#{gemdef['name']}'"
+      options = {}
+      options[:require] = gemdef['require_name'] if gemdef['require_name']
+      options[:version] = gemdef['version'] if gemdef['version']
+      options[:load] = false if gemdef['load'] == false
+      unless options.empty?
+        x << ", #{options.inspect.gsub('=>', ' => ')})"
+      else
+        x << ')'
+      end
+      f.puts x
+    end
+  
+    f.puts 'end'
+  end
+  puts File.read(out_path)
+else
+  puts %{
+You entered an UNKNOWN command '#{command}'!
+
+#{command_message}
+  }.strip
+  exit(-1)
+end
