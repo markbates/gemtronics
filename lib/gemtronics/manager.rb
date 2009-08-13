@@ -133,6 +133,7 @@ module Gemtronics
           unless g[:version].match(/^(\>\=|\>)/)
             cmd << " --version=#{g[:version]}"
           end
+          puts cmd
           system cmd
         end
       end
