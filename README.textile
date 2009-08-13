@@ -1,3 +1,140 @@
-README
-========================================================================
-gemtronics was developed by: markbates
+h1. Gemtronics - Simple and Smart Gem Management
+
+Gemtronics is designed to mitigate the pain of gem management for your Ruby applications. It can be used with standalone Ruby libraries or in Rails applications, it doesn't much matter to Gemtronics.
+
+h3. Installation
+
+Gemtronics is, itself, a RubyGem. So yes, there is on dependency you have to have on your machine before you can use it to manage your other gems for your projects.
+
+<pre><code>
+  $ sudo gem install gemtronics
+</code></pre>
+
+Or, if you prefer to live on the edge:
+
+<pre><code>
+  $ sudo gem install markbates-gemtronics --source=http://gems.github.com
+</code></pre>
+
+h2. Usage
+
+Gemtronics comes bundled with a binary that can help make life a little nicer. The binary has three different options, generate, convert, and install.
+
+h3. Generate
+
+Gemtronics will generate a sample file for you by using the binary, like such:
+
+<pre><code>
+  $ gemtronics generate
+</code></pre>
+
+That will output the following into a file called <code>config/gemtronics.rb</code>:
+
+<pre><code>
+  group(:default) do |g|
+    # g.add('gem name here')
+    # g.add('gem name here', :version => '1.2.3')
+    # g.add('gem name here', :version => '1.2.3', :source => 'http://gems.example.com')
+    # g.add('gem name here', :version => '1.2.3', :source => 'http://gems.example.com', :require => ['file1', 'file2'])
+  end
+
+  group(:production, :dependencies => :default) do |g|
+  end
+
+  group(:development, :dependencies => :default) do |g|
+  end
+
+  group(:test, :dependencies => :development) do |g|
+  end
+</code></pre>
+
+If you don't like that file path you can tell it where to generate the file for you:
+
+<pre><code>
+  $ gemtronics generate path/to/my/file.rb
+</code></pre>
+
+It is encouraged that you use the default path for your file, as it will make it easier for Gemtronics to find it later.
+
+h3. Convert
+
+On the off chance you are using the old Gemtools project for managing your gems, Gemtronics can easily convert that old school YAML file to the Gemtronics format:
+
+<pre><code>
+  $ gemtronics convert path/to/my/gems.yml
+</code></pre>
+
+h3. Install
+
+Once you have setup your Gemtronics file, more on that in a minute, you can use it to easily install your gems from it:
+
+<pre><code>
+  $ gemtronics install
+</code></pre>
+
+Gemtronics will read the <code>config/gemtronics.rb</code> and install all the gems in the <code>:default</code> group. If you would like to specify a different group you can do that like so:
+
+<pre><code>
+  $ gemtronics install production
+</code></pre>
+
+If you did not put your file in <code>config/gemtronics.rb</code> you will need to specify the path:
+
+<pre><code>
+  $ gemtronics install default path/to/my/file.rb
+</code></pre>
+
+Gemtronics will not install gems again if they already exist on your machine. This makes installation fast and easy!
+
+h2. Configuring Your Gems
+
+Gemtronics has the concept that gems can be grouped. Why would you want to group your gems? Great question. Perhaps you have a default set of gems that you want to use with your application, you would put them in the <code>default</code> group. In testing and development you might want to include other gems, such as <code>ruby-debug</code>, that you wouldn't want running/installed on your production machines. In this case you would group them in another group that depends on the <code>default</code> group.
+
+Defining a group is very easy:
+
+<pre><code>
+  group(:default) do |g|
+    g.add('gem1')
+  end
+</code></pre>
+
+When you add gems to a group you can set all the necessary gem options, or just inherit the default options. See the sample file below, or the rest of the RDOC for more information.
+
+h3. Rails
+
+Right about now you're saying to yourself, I use the Rails gem management system, why should I use this? Well, because the Rails gem management system is flawed at it's very core. You define your gems in the environment, which means the environment must be loaded to load/install your gems. However, this cause blow up if a gem is not installed when it loads the environment. Plus, why would you want to load the environment just to install gems?
+
+Gemtronics also has the advantage of being an independent system to Rails, which means that you can use it to install Rails for you!
+
+h2. Sample:
+
+<pre><code>
+  group(:default) do |g|
+    g.add('gem1')
+    g.add('gem2', :version => '1.2.3')
+    g.add('gem3', :source => 'http://gems.github.com')
+    g.add('gem4', :require => 'gem-four')
+    g.add('gem5', :require => ['gem-five', 'gemfive'])
+    g.add('gem6', :load => false)
+  end
+
+  group(:production, :dependencies => :default) do |g|
+    g.add('gem3', :load => false)
+    g.remove('gem1')
+    g.add('gem4', :source => 'http://gems.example.org')
+  end
+
+  group(:development, :dependencies => :default) do |g|
+    g.add('gem7', :version => '>=1.2.3.4', :load => false, :require => 'gemseven')
+  end
+
+  group(:test, :dependencies => :development, :source => 'http://gems.example.com') do |g|
+    g.add('gem8')
+  end
+
+  group(:staging) do |g|
+    g.add('gem2', :version => '3.2.1')
+    g.dependency(:development)
+    g.add('gem7', :load => true)
+  end
+</code></pre>
