@@ -36,6 +36,23 @@ describe Gemtronics::Grouper do
       gm.should == {:source => "http://gems.example.org", :load => true, :version => ">=0.0.0", :require => ["gem2"], :name => "gem2"}
     end
     
+    it 'should merge in the new definition if add is called again' do
+      gemtronics.group(:test) do |g|
+        g.add('gem1', :version => '1.2.3')
+      end
+      group = gemtronics.groups[:test]
+      group.gems.size.should == 1
+      gm = group.gems.first
+      gm.should == {:source => "http://gems.rubyforge.org", :load => true, :version => "1.2.3", :require => ["gem1"], :name => "gem1"}
+      gemtronics.group(:test) do |g|
+        g.add('gem1', :version => '3.2.1')
+      end
+      group = gemtronics.groups[:test]
+      group.gems.size.should == 1
+      gm = group.gems.first
+      gm.should == {:source => "http://gems.rubyforge.org", :load => true, :version => "3.2.1", :require => ["gem1"], :name => "gem1"}
+    end
+    
   end
   
   describe 'remove' do

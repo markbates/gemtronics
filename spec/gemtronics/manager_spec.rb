@@ -80,23 +80,23 @@ describe Gemtronics::Manager do
       groups.size.should == 5
       
       default = groups[:default]
-      default.gems.should == [{:source => "http://gems.rubyforge.org", :load => true, :version => ">=0.0.0", :require => ["gem1"], :name => "gem1"}, 
-                              {:source => "http://gems.rubyforge.org", :load => true, :version => "1.2.3", :require => ["gem2"], :name => "gem2"}, 
-                              {:source => "http://gems.github.com", :load => true, :version => ">=0.0.0", :require => ["gem3"], :name => "gem3"}, 
-                              {:source => "http://gems.rubyforge.org", :load => true, :version => ">=0.0.0", :require => ["gem-four"], :name => "gem4"}, 
-                              {:source => "http://gems.rubyforge.org", :load => true, :version => ">=0.0.0", :require => ["gem-five", "gemfive"], :name => "gem5"}, 
-                              {:source => "http://gems.rubyforge.org", :load => false, :version => ">=0.0.0", :require => ["gem6"], :name => "gem6"}]
+      default.gems.should == [
+        {:source => "http://gems.rubyforge.org", :load => true, :version => ">=0.0.0", :require => ["gem1"], :name => "gem1"}, 
+        {:source => "http://gems.rubyforge.org", :load => true, :version => "1.2.3", :require => ["gem2"], :name => "gem2"}, 
+        {:source => "http://gems.github.com", :load => true, :version => ">=0.0.0", :require => ["gem3"], :name => "gem3"}, 
+        {:source => "http://gems.rubyforge.org", :load => true, :version => ">=0.0.0", :require => ["gem-four"], :name => "gem4"}, 
+        {:source => "http://gems.rubyforge.org", :load => true, :version => ">=0.0.0", :require => ["gem-five", "gemfive"], :name => "gem5"}, 
+        {:source => "http://gems.rubyforge.org", :load => false, :version => ">=0.0.0", :require => ["gem6"], :name => "gem6"}]
       
       staging = groups[:staging]
-      staging.gems.should == [{:source => "http://gems.rubyforge.org", :load => true, :version => "3.2.1", :require => ["gem2"], :name => "gem2"}, 
-                              {:source => "http://gems.rubyforge.org", :load => true, :version => ">=0.0.0", :require => ["gem1"], :name => "gem1"}, 
-                              {:source => "http://gems.rubyforge.org", :load => true, :version => "1.2.3", :require => ["gem2"], :name => "gem2"}, 
-                              {:source => "http://gems.github.com", :load => true, :version => ">=0.0.0", :require => ["gem3"], :name => "gem3"}, 
-                              {:source => "http://gems.rubyforge.org", :load => true, :version => ">=0.0.0", :require => ["gem-four"], :name => "gem4"}, 
-                              {:source => "http://gems.rubyforge.org", :load => true, :version => ">=0.0.0", :require => ["gem-five", "gemfive"], :name => "gem5"}, 
-                              {:source => "http://gems.rubyforge.org", :load => false, :version => ">=0.0.0", :require => ["gem6"], :name => "gem6"}, 
-                              {:source => "http://gems.rubyforge.org", :load => false, :version => ">=1.2.3.4", :require => ["gemseven"], :name => "gem7"}, 
-                              {:source => "http://gems.rubyforge.org", :load => true, :version => ">=0.0.0", :require => ["gem7"], :name => "gem7"}]
+      staging.gems.should == [
+        {:source => "http://gems.rubyforge.org", :version => "1.2.3", :load => true, :require => ["gem2"], :name => "gem2"}, 
+        {:source => "http://gems.rubyforge.org", :version => ">=0.0.0", :load => true, :require => ["gem1"], :name => "gem1"}, 
+        {:source => "http://gems.github.com", :version => ">=0.0.0", :load => true, :require => ["gem3"], :name => "gem3"}, 
+        {:source => "http://gems.rubyforge.org", :version => ">=0.0.0", :load => true, :require => ["gem-four"], :name => "gem4"}, 
+        {:source => "http://gems.rubyforge.org", :version => ">=0.0.0", :load => true, :require => ["gem-five", "gemfive"], :name => "gem5"}, 
+        {:source => "http://gems.rubyforge.org", :version => ">=0.0.0", :load => false, :require => ["gem6"], :name => "gem6"}, 
+        {:source => "http://gems.rubyforge.org", :version => ">=1.2.3.4", :load => true, :require => ["gemseven"], :name => "gem7"}]
       
     end
     

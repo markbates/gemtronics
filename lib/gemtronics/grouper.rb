@@ -32,13 +32,13 @@ module Gemtronics
     def initialize(options = {})
       self.gems = []
       options = {} if options.nil?
-      deps = options.delete(:dependencies)
+      self.group_options = Gemtronics::Manager::GLOBAL_DEFAULT_OPTIONS.merge(options)
+      deps = self.group_options.delete(:dependencies)
       if deps
         [deps].flatten.each do |dep|
           self.dependency(dep)
         end
       end
-      self.group_options = Gemtronics::Manager::GLOBAL_DEFAULT_OPTIONS.merge(options)
       self
     end
     
@@ -69,9 +69,20 @@ module Gemtronics
     #         {:name => 'gem4', :version => '>=1.0.0', :source => 'http://gems.rubyforge.org', 
     #          :require => ['gemfour']}, :load => false]
     def add(name, options = {})
-      g = self.group_options.merge({:name => name.to_s, :require => [name.to_s]}.merge(options))
+      name = name.to_s
+      ind = self.gems.size
+      g = {}
+      self.gems.each_with_index do |gemdef, i|
+        if gemdef[:name] == name
+          g = gemdef
+          ind = i
+          break
+        end
+      end
+
+      g = self.group_options.merge({:name => name, :require => [name]}.merge(g).merge(options))
       g[:require] = [g[:require]].flatten
-      self.gems << g
+      self.gems[ind] = g
     end
     
     # Removes a gem from the group.
@@ -117,8 +128,9 @@ module Gemtronics
     def dependency(name)
       group = Gemtronics::Manager.instance.groups[name.to_sym]
       if group
-        self.gems << group.gems.dup
-        self.gems.flatten!
+        group.gems.dup.each do |gemdef|
+          self.add(gemdef[:name], gemdef)
+        end
       end
     end
     
