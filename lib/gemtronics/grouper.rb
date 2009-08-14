@@ -5,10 +5,14 @@ module Gemtronics
   # 
   # See Gemtronics::Manager for more details on creating a group.
   class Grouper
+    # The name of this group
+    attr_accessor :name
     # The Array of gems belonging to this group.
     attr_accessor :gems
     # A Hash representing the default options for this group.
     attr_accessor :group_options
+    # An Array containing the names of the dependents of this group.
+    attr_accessor :dependents
     
     # Creates a new Gemtronics::Grouper class. It takes a Hash
     # of options that will be applied to all gems added to the group.
@@ -29,8 +33,10 @@ module Gemtronics
     # 
     # In this example the <tt>:test</tt> group would
     # now have the following gems: <tt>gem1, gem2, gem3</tt>
-    def initialize(options = {})
+    def initialize(name, options = {})
+      self.name = name
       self.gems = []
+      self.dependents = []
       options = {} if options.nil?
       self.group_options = Gemtronics::Manager::GLOBAL_DEFAULT_OPTIONS.merge(options)
       deps = self.group_options.delete(:dependencies)
@@ -83,6 +89,9 @@ module Gemtronics
       g = self.group_options.merge({:name => name, :require => [name]}.merge(g).merge(options))
       g[:require] = [g[:require]].flatten
       self.gems[ind] = g
+      self.dependents.each do |dep|
+        Gemtronics.group(dep).add(name, options)
+      end
     end
     
     # Removes a gem from the group.
@@ -128,6 +137,7 @@ module Gemtronics
     def dependency(name)
       group = Gemtronics::Manager.instance.groups[name.to_sym]
       if group
+        Gemtronics.group(name.to_sym).dependents << self.name
         group.gems.dup.each do |gemdef|
           self.add(gemdef[:name], gemdef)
         end

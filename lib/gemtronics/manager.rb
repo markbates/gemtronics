@@ -28,8 +28,12 @@ module Gemtronics
     def group(name, options = {})
       name = name.to_sym
       options = GLOBAL_DEFAULT_OPTIONS.merge(options)
-      g = (self.groups[name] ||= Gemtronics::Grouper.new(options))
-      yield g if block_given?
+      g = (self.groups[name] ||= Gemtronics::Grouper.new(name, options))
+      if block_given?
+        yield g
+      else
+        return g
+      end
     end
     
     # Aliases one gem group to another group.

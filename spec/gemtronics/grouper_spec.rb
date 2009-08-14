@@ -53,6 +53,21 @@ describe Gemtronics::Grouper do
       gm.should == {:source => "http://gems.rubyforge.org", :load => true, :version => "3.2.1", :require => ["gem1"], :name => "gem1"}
     end
     
+    it 'should add the gem to the dependencies of the group' do
+      gemtronics.group(:grp1) do |g|
+        g.add('gem1')
+      end
+      gemtronics.group(:grp2, :dependencies => :grp1) do |g|
+        g.add('gem2')
+      end
+      gemtronics.group(:grp1) do |g|
+        g.add('gem3')
+      end
+      group = gemtronics.groups[:grp2]
+      group.gems.size.should == 3
+      group.gems[2].should == {:source => "http://gems.rubyforge.org", :load => true, :version => ">=0.0.0", :require => ["gem3"], :name => "gem3"}
+    end
+    
   end
   
   describe 'remove' do
