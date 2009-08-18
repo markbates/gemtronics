@@ -25,7 +25,7 @@ case command
 when 'install'
   path = ARGV[2] || File.join('config', 'gemtronics.rb')
   Gemtronics.load(path)
-  Gemtronics.install_gems(ARGV[1] || 'default')
+  Gemtronics.install_gems(ARGV[1] || 'everything!')
 when 'generate'
   path = ARGV[1] || 'config'
   FileUtils.mkdir_p(path)

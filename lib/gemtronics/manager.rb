@@ -128,6 +128,10 @@ module Gemtronics
     #   # gem install gem2 --source=http://gems.rubyforge.org --version=1.2.3
     #   # gem install gem6 --source=http://gems.example.com
     def install_gems(group = :default)
+      if group == 'everything!'
+        install_all_gems
+        return
+      end
       group = self.groups[group.to_sym]
       return if group.nil?
       

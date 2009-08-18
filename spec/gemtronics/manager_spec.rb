@@ -70,6 +70,13 @@ describe Gemtronics::Manager do
       gemtronics.install_gems(:test)
     end
     
+    it 'should install all gems if passed the everything! group' do
+      gemtronics.group(:foo)
+      gemtronics.group(:bar)
+      gemtronics.should_receive(:install_all_gems)
+      gemtronics.install_gems('everything!')
+    end
+    
   end
   
   describe 'load' do
