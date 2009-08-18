@@ -9,9 +9,11 @@ module Gemtronics
     
     # A Hash of all the groups that have been defined.
     attr_accessor :groups
+    attr_accessor :installed_gems # :nodoc:
     
     def initialize # :nodoc:
       reset!
+      self.installed_gems = []
     end
     
     # Creates, or reopens a new group of gems. It takes the name of the 
@@ -143,6 +145,7 @@ module Gemtronics
           end
           puts cmd
           system cmd
+          self.installed_gems << "#{g[:name]}-#{g[:version]}"
         end
       end
     end
@@ -160,6 +163,7 @@ module Gemtronics
     private
     def gem_installed?(name, version) # :nodoc:
       begin
+        return true if self.installed_gems.include?("#{name}-#{version}")
         gem(name, version)
         return true
       rescue Gem::LoadError => e
