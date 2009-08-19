@@ -2,17 +2,17 @@
 
 Gem::Specification.new do |s|
   s.name = %q{gemtronics}
-  s.version = "0.3.2.20090818161635"
+  s.version = "0.4.0.20090819151952"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["markbates"]
-  s.date = %q{2009-08-18}
+  s.date = %q{2009-08-19}
   s.default_executable = %q{gemtronics}
   s.description = %q{gemtronics was developed by: markbates}
   s.email = %q{}
   s.executables = ["gemtronics"]
   s.extra_rdoc_files = ["README", "LICENSE"]
-  s.files = ["lib/gemtronics/gemtronics.rb", "lib/gemtronics/grouper.rb", "lib/gemtronics/manager.rb", "lib/gemtronics.rb", "README", "LICENSE", "bin/gemtronics"]
+  s.files = ["lib/gemtronics/definition.rb", "lib/gemtronics/gemtronics.rb", "lib/gemtronics/grouper.rb", "lib/gemtronics/manager.rb", "lib/gemtronics.rb", "README", "LICENSE", "bin/gemtronics"]
   s.homepage = %q{}
   s.require_paths = ["lib"]
   s.rubyforge_project = %q{magrathea}

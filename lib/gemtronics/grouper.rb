@@ -79,15 +79,14 @@ module Gemtronics
       ind = self.gems.size
       g = {}
       self.gems.each_with_index do |gemdef, i|
-        if gemdef[:name] == name
+        if gemdef.name == name
           g = gemdef
           ind = i
           break
         end
       end
 
-      g = self.group_options.merge({:name => name, :require => [name]}.merge(g).merge(options))
-      g[:require] = [g[:require]].flatten
+      g = Gemtronics::Definition[self.group_options.merge({:name => name, :require => [name]}.merge(g).merge(options))]
       self.gems[ind] = g
       self.dependents.each do |dep|
         Gemtronics.group(dep).add(name, options)
@@ -112,7 +111,7 @@ module Gemtronics
     # now have the following gems: <tt>gem1, gem3, gem4</tt>
     def remove(name)
       self.gems.each do |g|
-        if g[:name] = name.to_s
+        if g.name = name.to_s
           self.gems.delete(g)
           break
         end
@@ -139,7 +138,7 @@ module Gemtronics
       if group
         Gemtronics.group(name.to_sym).dependents << self.name
         group.gems.dup.each do |gemdef|
-          self.add(gemdef[:name], gemdef)
+          self.add(gemdef.name, gemdef)
         end
       end
     end

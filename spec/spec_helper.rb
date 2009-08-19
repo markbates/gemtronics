@@ -37,3 +37,8 @@ end
 def fixture_value(*args)
   File.read(fixture_path(*args))
 end
+
+def gemdef(name, options = {})
+  gemdef = Gemtronics::Definition[{:name => name, :require => [name], :version => '>=0.0.0', :source => 'http://gems.rubyforge.org', :load => true}.merge(options)]
+  return gemdef
+end

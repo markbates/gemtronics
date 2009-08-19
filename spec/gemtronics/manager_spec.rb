@@ -54,10 +54,10 @@ describe Gemtronics::Manager do
     end
     
     it 'should not install already installed gems' do
-      gemtronics.should_receive(:gem_installed?).with('gem1', '>=0.0.0').and_return(false)
-      gemtronics.should_receive(:gem_installed?).with('gem2', '>=1.2.3').and_return(false)
-      gemtronics.should_receive(:gem_installed?).with('gem3', '4.5.6').and_return(false)
-      gemtronics.should_receive(:gem_installed?).with('gem4', '>=0.0.0').and_return(true)
+      gemtronics.should_receive(:gem_installed?).with(gemdef('gem1', :source => 'http://gems.example.org')).and_return(false)
+      gemtronics.should_receive(:gem_installed?).with(gemdef('gem2', :version => '>=1.2.3')).and_return(false)
+      gemtronics.should_receive(:gem_installed?).with(gemdef('gem3', :version => '4.5.6')).and_return(false)
+      gemtronics.should_receive(:gem_installed?).with(gemdef('gem4')).and_return(true)
       gemtronics.should_receive(:system).with('gem install gem3 --source=http://gems.rubyforge.org --version=4.5.6')
       gemtronics.should_receive(:system).with('gem install gem2 --source=http://gems.rubyforge.org')
       gemtronics.should_receive(:system).with('gem install gem1 --source=http://gems.example.org')
@@ -88,22 +88,24 @@ describe Gemtronics::Manager do
       
       default = groups[:default]
       default.gems.should == [
-        {:source => "http://gems.rubyforge.org", :load => true, :version => ">=0.0.0", :require => ["gem1"], :name => "gem1"}, 
-        {:source => "http://gems.rubyforge.org", :load => true, :version => "1.2.3", :require => ["gem2"], :name => "gem2"}, 
-        {:source => "http://gems.github.com", :load => true, :version => ">=0.0.0", :require => ["gem3"], :name => "gem3"}, 
-        {:source => "http://gems.rubyforge.org", :load => true, :version => ">=0.0.0", :require => ["gem-four"], :name => "gem4"}, 
-        {:source => "http://gems.rubyforge.org", :load => true, :version => ">=0.0.0", :require => ["gem-five", "gemfive"], :name => "gem5"}, 
-        {:source => "http://gems.rubyforge.org", :load => false, :version => ">=0.0.0", :require => ["gem6"], :name => "gem6"}]
+        gemdef('gem1'),
+        gemdef('gem2', :version => '1.2.3'),
+        gemdef('gem3', :source => 'http://gems.github.com'),
+        gemdef('gem4', :require => 'gem-four'),
+        gemdef('gem5', :require => ["gem-five", "gemfive"]),
+        gemdef('gem6', :load => false)
+      ]
       
       staging = groups[:staging]
       staging.gems.should == [
-        {:source => "http://gems.rubyforge.org", :version => "1.2.3", :load => true, :require => ["gem2"], :name => "gem2"}, 
-        {:source => "http://gems.rubyforge.org", :version => ">=0.0.0", :load => true, :require => ["gem1"], :name => "gem1"}, 
-        {:source => "http://gems.github.com", :version => ">=0.0.0", :load => true, :require => ["gem3"], :name => "gem3"}, 
-        {:source => "http://gems.rubyforge.org", :version => ">=0.0.0", :load => true, :require => ["gem-four"], :name => "gem4"}, 
-        {:source => "http://gems.rubyforge.org", :version => ">=0.0.0", :load => true, :require => ["gem-five", "gemfive"], :name => "gem5"}, 
-        {:source => "http://gems.rubyforge.org", :version => ">=0.0.0", :load => false, :require => ["gem6"], :name => "gem6"}, 
-        {:source => "http://gems.rubyforge.org", :version => ">=1.2.3.4", :load => true, :require => ["gemseven"], :name => "gem7"}]
+        gemdef('gem2', :version => '1.2.3'),
+        gemdef('gem1'),
+        gemdef('gem3', :source => 'http://gems.github.com'), 
+        gemdef('gem4', :require => 'gem-four'), 
+        gemdef('gem5', :require => ["gem-five", "gemfive"]),
+        gemdef('gem6', :load => false),
+        gemdef('gem7', :version => ">=1.2.3.4", :require => 'gemseven')
+      ]
       
     end
     

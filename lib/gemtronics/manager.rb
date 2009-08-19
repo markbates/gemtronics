@@ -100,9 +100,9 @@ module Gemtronics
       return if group.nil?
       options = {:verbose => false}.merge(options)
       group.gems.each do |g|
-        if g[:load] == true
-          gem(g[:name], g[:version])
-          g[:require].each do |f|
+        if g.load? == true
+          gem(g.name, g.version)
+          g.require_list.each do |f|
             puts "require #{f}" if options[:verbose]
             require f
           end
@@ -138,14 +138,11 @@ module Gemtronics
       return if group.nil?
       
       group.gems.each do |g|
-        unless gem_installed?(g[:name], g[:version])
-          cmd = "gem install #{g[:name]} --source=#{g[:source]}"
-          unless g[:version].match(/^(\>\=|\>)/)
-            cmd << " --version=#{g[:version]}"
-          end
+        unless gem_installed?(g)
+          cmd = g.install_command
           puts cmd
           system cmd
-          self.installed_gems << "#{g[:name]}-#{g[:version]}"
+          self.installed_gems << g.to_s
         end
       end
     end
@@ -161,15 +158,9 @@ module Gemtronics
     end
     
     private
-    def gem_installed?(name, version) # :nodoc:
-      begin
-        return true if self.installed_gems.include?("#{name}-#{version}")
-        gem(name, version)
-        return true
-      rescue Gem::LoadError => e
-        return true if e.message.match(/can't activate/)
-        return false
-      end
+    def gem_installed?(gemdef) # :nodoc:
+      return true if self.installed_gems.include?(gemdef.to_s)
+      return gemdef.installed?
     end
     
   end # Manager

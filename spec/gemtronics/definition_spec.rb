@@ -6,74 +6,101 @@ describe Gemtronics::Definition do
     @gd = Gemtronics::Definition.new
   end
   
-  describe 'name' do
+  describe 'to_s' do
     
-    it 'should return the name property' do
-      @gd[:name] = 'foo'
-      @gd.name.should == 'foo'
-    end
-    
-    it 'should set the name property' do
-      @gd.name = 'bar'
-      @gd.name.should == 'bar'
+    it 'should concat the name-version' do
+      @gd.name = 'my_gem'
+      @gd.version = '1.0.0'
+      @gd.to_s.should == 'my_gem-1.0.0'
     end
     
   end
   
-  describe 'load' do
+  describe 'install_command' do
     
-    it 'should return the load property' do
-      @gd[:load] = true
-      @gd.load.should be_true
-    end
-    
-    it 'should set the load property' do
-      @gd.load = false
-      @gd.load.should be_false
+    it 'should generate an install command string' do
+      @gd.name = 'my_gem'
+      @gd.install_command.should == 'gem install my_gem --source=http://gems.rubyforge.org'
+      @gd.version = '1.2.3'
+      @gd.install_command.should == 'gem install my_gem --source=http://gems.rubyforge.org --version=1.2.3'
+      @gd.source = 'http://gems.example.org'
+      @gd.install_command.should == 'gem install my_gem --source=http://gems.example.org --version=1.2.3'
     end
     
   end
   
-  describe 'version' do
+  describe 'installed?' do
     
-    it 'should return the version property' do
-      @gd[:version] = 'foo'
-      @gd.version.should == 'foo'
+    it 'should return true if the gem is installed' do
+      @gd.should_receive(:gem).once.with('gem1', '1.2.3').and_return(true)
+      @gd.name = 'gem1'
+      @gd.version = '1.2.3'
+      @gd.should be_installed
     end
     
-    it 'should set the version property' do
-      @gd.version = 'bar'
-      @gd.version.should == 'bar'
+    it 'should return false if the gem is not installed' do
+      @gd.should_receive(:gem).once.with('gem1', '1.2.3').and_return {raise Gem::LoadError.new}
+      @gd.name = 'gem1'
+      @gd.version = '1.2.3'
+      @gd.should_not be_installed
     end
     
   end
+  
+  def self.property(name, defval = nil, key = name)
+    
+    describe name do
+      
+      it "should return the #{name} property" do
+        @gd[key] = 'foo'
+        @gd.send(name).should == 'foo'
+      end
+
+      it "should set the #{name} property" do
+        @gd.send("#{name.to_s.gsub('?', '')}=", 'bar')
+        @gd.send(name).should == 'bar'
+      end
+
+      it "should return #{defval} if the #{name} property is not set" do
+        @gd.send(name).should == defval
+      end
+      
+    end
+    
+  end
+
+  property(:name)
+  property(:version, '>=0.0.0')
+  property(:source, 'http://gems.rubyforge.org')
+  property(:load?, true, :load)
   
   describe 'require_list' do
     
     it 'should return the require_list property' do
       @gd[:require] = 'foo'
-      @gd.require_list.should == 'foo'
+      @gd.require_list.should == ['foo']
     end
     
     it 'should set the require_list property' do
       @gd.require_list = 'bar'
-      @gd.require_list.should == 'bar'
+      @gd.require_list.should == ['bar']
+    end
+    
+    it 'should return an array with the name of the gem if the property is not set' do
+      @gd.name = 'gem1'
+      @gd.require_list.should == ['gem1']
     end
     
   end
   
-  describe 'source' do
+  describe 'new' do
     
-    it 'should return the source property' do
-      @gd[:source] = 'foo'
-      @gd.source.should == 'foo'
-    end
-    
-    it 'should set the source property' do
-      @gd.source = 'bar'
-      @gd.source.should == 'bar'
+    it 'should take a hash' do
+      gd = Gemtronics::Definition[:name => 'gem1']
+      gd.name.should == 'gem1'
     end
     
   end
+
   
 end
