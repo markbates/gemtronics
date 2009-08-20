@@ -68,6 +68,28 @@ module Gemtronics
       end
     end
     
+    # Calls the <tt>gem</tt> method with <tt>name</tt> and <tt>version</tt>.
+    # It does NOT do any requiring!
+    # 
+    # Example:
+    #   gd = Gemtronics::Definition.new
+    #   gd.name = 'my_gem'
+    #   gd.version = '1.2.3'
+    #   gd.load_gem # => gem('my_gem', '1.2.3')
+    def load_gem
+      gem(self.name, self.version)
+    end
+    
+    # Calls the <tt>load_gem</tt> method and then requires each
+    # file in the <tt>require_list</tt>
+    def require_gem(options = {})
+      load_gem
+      self.require_list.each do |f|
+        puts "require #{f}" if options[:verbose]
+        require f
+      end
+    end
+    
     private
     def self.build_method(name, defval = nil, key = name) # :nodoc:
       define_method(name) do

@@ -6,6 +6,30 @@ describe Gemtronics::Definition do
     @gd = Gemtronics::Definition.new
   end
   
+  describe 'load_gem' do
+    
+    it 'should load the gem' do
+      @gd.name = 'gem1'
+      @gd.version = '1.2.3'
+      @gd.should_receive(:gem).once.with('gem1', '1.2.3')
+      @gd.load_gem
+    end
+    
+  end
+  
+  describe 'require_gem' do
+    
+    it 'should require the files in the require_list' do
+      @gd.name = 'gem1'
+      @gd.require_list = ['file1', 'file2']
+      @gd.should_receive(:gem).once.with('gem1', '>=0.0.0')
+      @gd.should_receive(:require).with('file1')
+      @gd.should_receive(:require).with('file2')
+      @gd.require_gem
+    end
+    
+  end
+  
   describe 'to_s' do
     
     it 'should concat the name-version' do

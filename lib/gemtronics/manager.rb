@@ -100,11 +100,7 @@ module Gemtronics
       options = {:verbose => false}.merge(options)
       group.gems.each do |g|
         if g.load? == true
-          gem(g.name, g.version)
-          g.require_list.each do |f|
-            puts "require #{f}" if options[:verbose]
-            require f
-          end
+          g.require_gem
         end
       end
     end
@@ -189,6 +185,27 @@ module Gemtronics
         end        
       end
       raise "#{name} has not been defined!"
+    end
+    
+    # Allows you to chain method calls together. An important note is
+    # that the <tt>*args</tt> are only passed into the first method in
+    # the chain.
+    # 
+    # Example:
+    #   Gemtronics.find_and_require_gem('gem1', :group => :production)
+    # 
+    # This will call the <tt>find</tt> method on Gemtronics::Manager
+    # and pass it the arguments <tt>{:group => :production}</tt>. It will then
+    # call the <tt>require_gem</tt> method on the Gemtronics::Definition class
+    # returned by the <tt>find</tt> method.
+    def method_missing(sym, *args)
+      chain = sym.to_s.split('_and_')
+      raise NoMethodError.new(sym.to_s) if chain.nil? || chain.empty? || chain.size == 1
+      res = self.send(chain[0], *args)
+      chain[1..chain.size].each do |meth|
+        res = res.send(meth)
+      end
+      return res
     end
     
     private

@@ -50,6 +50,23 @@ describe Gemtronics::Manager do
     
   end
   
+  describe 'method_missing' do
+    
+    it' should try and chain methods based on _and_' do
+      gemdef = mock('gem1')
+      gemdef.should_receive(:require_gem)
+      gemtronics.should_receive(:find).with('gem1').and_return(gemdef)
+      gemtronics.find_and_require_gem('gem1')
+    end
+    
+    it 'should call super if not a chained method call' do
+      lambda {
+        gemtronics.foo_bar
+      }.should raise_error(NoMethodError)
+    end
+    
+  end
+  
   describe 'group' do
     
     it 'should yield a Grouper class' do
@@ -66,22 +83,22 @@ describe Gemtronics::Manager do
   describe 'require_gems' do
     
     it 'should only require gems that have load set to true' do
-      gemtronics.should_receive(:gem).once.with('gem1', '>=0.0.0')
-      gemtronics.should_receive(:require).once.with('gem1')
       gemtronics.group(:test) do |g|
         g.add('gem1')
         g.add('gem2', :load => false)
       end
+      gemtronics.group(:test).search('gem1').should_receive(:gem).once.with('gem1', '>=0.0.0')
+      gemtronics.group(:test).search('gem1').should_receive(:require).once.with('gem1')
       gemtronics.require_gems(:test)
     end
     
     it 'should handle Array based requires' do
-      gemtronics.should_receive(:gem).once.with('gem1', '>=0.0.0')
-      gemtronics.should_receive(:require).with('gem1')
-      gemtronics.should_receive(:require).with('gem-one')
       gemtronics.group(:test) do |g|
         g.add('gem1', :require => ['gem1', 'gem-one'])
       end
+      gemtronics.group(:test).search('gem1').should_receive(:gem).once.with('gem1', '>=0.0.0')
+      gemtronics.group(:test).search('gem1').should_receive(:require).with('gem1')
+      gemtronics.group(:test).search('gem1').should_receive(:require).with('gem-one')
       gemtronics.require_gems(:test)
     end
     
