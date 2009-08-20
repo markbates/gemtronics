@@ -145,6 +145,9 @@ module Gemtronics
     
     # Finds and returns a Gemtronics::Definition for the specified
     # gem, if one exists.
+    # 
+    # Example:
+    #   Gemtronics.group(:test).search('gem1')
     def search(name, options = {})
       self.gems.each do |g|
         return g if g.name == name

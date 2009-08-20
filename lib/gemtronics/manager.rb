@@ -170,6 +170,9 @@ module Gemtronics
     # Finally it will search all gems and return the first one it
     # finds. There is no guarantee as to the order it searches through
     # the groups.
+    # 
+    #   Gemtronics.find('gem1')
+    #   Gemtronics.find('gem1', :group => :production)
     def find(name, options = {})
       group = options[:group]
       if group
