@@ -13,7 +13,6 @@ module Gemtronics
     
     def initialize # :nodoc:
       reset!
-      self.installed_gems = []
     end
     
     # Creates, or reopens a new group of gems. It takes the name of the 
@@ -155,6 +154,38 @@ module Gemtronics
     
     def reset! # :nodoc:
       self.groups = {}
+      self.installed_gems = []
+    end
+    
+    # Finds and returns a Gemtronics::Definition for the specified
+    # gem, if one exists.
+    # 
+    # Search Order:
+    # If the option <tt>:group</tt> is passed in it will search
+    # only within that group.
+    # 
+    # If <tt>RAILS_ENV</tt> is defined it will search in the group
+    # that matches the current Rails environment
+    # 
+    # Finally it will search all gems and return the first one it
+    # finds. There is no guarantee as to the order it searches through
+    # the groups.
+    def find(name, options = {})
+      group = options[:group]
+      if group
+        group = self.groups[group.to_sym]
+        return nil if group.nil?
+        gemdef = group.search(name, options)
+        return gemdef unless gemdef.nil?        
+      elsif defined?(RAILS_ENV)
+        return find(name, {:group => RAILS_ENV.to_sym}.merge(options))
+      else
+        self.groups.each do |key, group|
+          gemdef = group.search(name, options)
+          return gemdef unless gemdef.nil?
+        end        
+      end
+      raise "#{name} has not been defined!"
     end
     
     private

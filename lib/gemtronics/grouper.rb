@@ -143,5 +143,14 @@ module Gemtronics
       end
     end
     
+    # Finds and returns a Gemtronics::Definition for the specified
+    # gem, if one exists.
+    def search(name, options = {})
+      self.gems.each do |g|
+        return g if g.name == name
+      end
+      return nil
+    end
+    
   end # Grouper
 end # Gemtronics

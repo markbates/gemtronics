@@ -13,6 +13,26 @@ describe Gemtronics::Grouper do
     group.gems.should == [{:source => "http://gems.rubyforge.org", :load => true, :version => ">=0.0.0", :require => ["gem1"], :name => "gem1"}, {:source => "http://gems.example.org", :load => true, :version => ">=0.0.0", :require => ["gem2"], :name => "gem2"}]
   end
   
+  describe 'search' do
+    
+    before(:each) do
+      gemtronics.group(:test) do |g|
+        g.add('gem1', :version => '1.2.3')
+      end
+    end
+    
+    it 'should return the defintion if the gem is defined' do
+      gemdef = gemtronics.group(:test).search('gem1')
+      gemdef.version.should == '1.2.3'
+    end
+    
+    it 'should return nil if the gem is not defined' do
+      gemdef = gemtronics.group(:test).search('gem2')
+      gemdef.should be_nil
+    end
+    
+  end
+  
   describe 'add' do
     
     it 'should add a gem to the list, and inherit the global options' do

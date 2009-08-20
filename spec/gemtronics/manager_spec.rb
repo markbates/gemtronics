@@ -2,6 +2,54 @@ require File.dirname(__FILE__) + '/../spec_helper'
 
 describe Gemtronics::Manager do
   
+  describe 'find' do
+    
+    before(:each) do
+      gemtronics.group(:default) do |g|
+        g.add('gem1')
+      end
+      gemtronics.group(:production, :dependencies => :default) do |g|
+        g.add('gem2', :version => '1.2.3')
+      end
+      gemtronics.group(:development, :dependencies => :default) do |g|
+        g.add('gem2', :version => '4.5.6')
+      end
+      gemtronics.group(:test, :dependencies => :development) do |g|
+        g.add('gem3', :version => '7.8.9')
+      end
+    end
+    
+    it 'should find a gem definition by RAILS_ENV' do
+      RAILS_ENV = 'development'
+      gemdef = gemtronics.find('gem2')
+      gemdef.version.should == '4.5.6'
+      Object.send(:remove_const, 'RAILS_ENV')
+    end
+    
+    it 'should find a gem definition by group name' do
+      gemtronics.find('gem2', :group => :development)
+    end
+    
+    it 'should find the gem definition by group name before RAILS_ENV' do
+      RAILS_ENV = 'production'
+      gemdef = gemtronics.find('gem2', :group => :development)
+      gemdef.version.should == '4.5.6'
+      Object.send(:remove_const, 'RAILS_ENV')
+    end
+    
+    it 'should find a gem definition' do
+      gemdef = gemtronics.find('gem2')
+      gemdef.name.should == 'gem2'
+    end
+    
+    it 'should raise an error if the gem does not exist' do
+      lambda {
+        gemtronics.find('unknowngem')
+      }.should raise_error('unknowngem has not been defined!')
+    end
+    
+  end
+  
   describe 'group' do
     
     it 'should yield a Grouper class' do
