@@ -106,6 +106,17 @@ Right about now you're saying to yourself, I use the Rails gem management system
 
 Gemtronics also has the advantage of being an independent system to Rails, which means that you can use it to install Rails for you!
 
+To use with Rails just create a file named <code>gemtronics.rb</code> in your <code>config</code> directory, and load it up with your favorite gems.
+
+Once you've set up your gems just add the following inside the initializer block in <code>environment.rb</code> (where you would normally call <code>config.gem</code>):
+
+<pre><code>
+  require 'gemtronics'
+  Gemtronics.for_rails(config)
+</code></pre>
+
+Gemtronics will use the current <code>RAILS_ENV</code> to load the correct gem group. You can override this by passing in the <code>:group</code> option and specify which group you would like to use.
+
 h2. Sample:
 
 <pre><code>

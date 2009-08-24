@@ -100,7 +100,7 @@ module Gemtronics
       options = {:verbose => false}.merge(options)
       group.gems.each do |g|
         if g.load? == true
-          g.require_gem
+          g.require_gem(options)
         end
       end
     end
@@ -206,6 +206,31 @@ module Gemtronics
         res = res.send(meth)
       end
       return res
+    end
+    
+    def for_rails(config, options = {})
+      options = {:gemtronics_path => File.join(RAILS_ROOT, 'config', 'gemtronics.rb'),
+                 :group => RAILS_ENV}.merge(options)
+      [options.delete(:gemtronics_path)].flatten.each do |path|
+        self.load(path)
+      end
+      [options.delete(:group)].flatten.each do |group_name|
+        group = self.groups[group_name.to_sym]
+        group.gems.each do |gemdef|
+          gemdef.require_list.each do |lib|
+            gopts = {}
+            gopts[:version] = gemdef.version unless gemdef.version == '>=0.0.0'
+            gopts[:source] = gemdef.source unless gemdef.source == 'http://gems.rubyforge.org'
+            gopts[:lib] = lib unless gemdef.name == lib
+            gopts[:lib] = false unless gemdef.load?
+            unless gopts.empty?
+              config.gem(gemdef.name, gopts)
+            else
+              config.gem(gemdef.name)
+            end
+          end
+        end
+      end
     end
     
     private

@@ -176,4 +176,32 @@ describe Gemtronics::Manager do
     
   end
   
+  describe 'for_rails' do
+    
+    before(:each) do
+      RAILS_ENV = 'test'
+      RAILS_ROOT = File.join(File.dirname(__FILE__), '..', 'rails_root')      
+    end
+    
+    after(:each) do
+      Object.send(:remove_const, 'RAILS_ENV')
+      Object.send(:remove_const, 'RAILS_ROOT')      
+    end
+    
+    it 'should call the config.gem method correctly' do
+      config = mock('Rails.configuration')
+      config.should_receive(:gem).with("gem6", :lib => false)
+      config.should_receive(:gem).with('gem4', :lib => 'gem-four')
+      config.should_receive(:gem).with('gem1')
+      config.should_receive(:gem).with('gem2', :version => '1.2.3')
+      config.should_receive(:gem).with('gem3', :source => 'http://gems.github.com')
+      config.should_receive(:gem).with('gem5', :lib => 'gemfive')
+      config.should_receive(:gem).with('gem5', :lib => 'gem-five')
+      config.should_receive(:gem).with('gem7', :version => '>=1.2.3.4', :lib => false)
+      config.should_receive(:gem).with('gem8', :source => 'http://gems.example.com')
+      gemtronics.for_rails(config)
+    end
+    
+  end
+  
 end

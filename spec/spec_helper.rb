@@ -42,3 +42,6 @@ def gemdef(name, options = {})
   gemdef = Gemtronics::Definition[{:name => name, :require => [name], :version => '>=0.0.0', :source => 'http://gems.rubyforge.org', :load => true}.merge(options)]
   return gemdef
 end
+
+module Rails
+end
