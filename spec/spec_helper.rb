@@ -39,7 +39,7 @@ def fixture_value(*args)
 end
 
 def gemdef(name, options = {})
-  gemdef = Gemtronics::Definition[{:name => name, :require => [name], :version => '>=0.0.0', :source => 'http://gems.rubyforge.org', :load => true}.merge(options)]
+  gemdef = Gemtronics::Definition[{:name => name, :require => [name], :version => '>=0.0.0', :source => 'http://gems.rubyforge.org', :load => true, :ri => false, :rdoc => false}.merge(options)]
   return gemdef
 end
 

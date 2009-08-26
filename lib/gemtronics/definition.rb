@@ -19,6 +19,16 @@ module Gemtronics
       # method built dynamically. This is just a stub for RDoc.
     end
     
+    # Returns true/false if the gem should be installed with ri. Defaults to <tt>false</tt>.
+    def ri?
+      # method built dynamically. This is just a stub for RDoc.
+    end
+    
+    # Set whether the gem should be installed with ri.
+    def ri=(x)
+      # method built dynamically. This is just a stub for RDoc.
+    end
+    
     # Returns an Array of files that should be required. Defaults to <tt>[<name>]</tt>
     def require_list
       return [self.name] unless self.has_key?(:require)
@@ -50,6 +60,14 @@ module Gemtronics
     #   gd.install_command #=> 'gem install configatron --source=http://gems.rubyforge.org --version=2.3.0'
     def install_command
       cmd = "gem install #{self.name} --source=#{self.source}"
+      unless self.ri?
+        cmd << ' --no-ri'
+      end
+      
+      unless self.rdoc?
+        cmd << ' --no-rdoc'
+      end
+      
       unless self.version.match(/^(\>\=|\>)/)
         cmd << " --version=#{self.version}"
       end
@@ -105,6 +123,8 @@ module Gemtronics
     build_method(:version, '>=0.0.0')
     build_method(:source, 'http://gems.rubyforge.org')
     build_method(:load?, true, :load)
+    build_method(:ri?, false, :ri)
+    build_method(:rdoc?, false, :rdoc)
     
   end # Definition
 end # Gemtronics

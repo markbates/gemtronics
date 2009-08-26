@@ -107,9 +107,9 @@ describe Gemtronics::Manager do
   describe 'install_gems' do
     
     it 'should install the gems' do
-      gemtronics.should_receive(:system).with('gem install gem3 --source=http://gems.rubyforge.org --version=4.5.6')
-      gemtronics.should_receive(:system).with('gem install gem2 --source=http://gems.rubyforge.org')
-      gemtronics.should_receive(:system).with('gem install gem1 --source=http://gems.example.org')
+      gemtronics.should_receive(:system).with('gem install gem3 --source=http://gems.rubyforge.org --no-ri --no-rdoc --version=4.5.6')
+      gemtronics.should_receive(:system).with('gem install gem2 --source=http://gems.rubyforge.org --no-ri --no-rdoc')
+      gemtronics.should_receive(:system).with('gem install gem1 --source=http://gems.example.org --no-ri --no-rdoc')
       gemtronics.group(:test) do |g|
         g.add('gem1', :source => 'http://gems.example.org')
         g.add('gem2', :version => '>=1.2.3')
@@ -123,9 +123,9 @@ describe Gemtronics::Manager do
       gemtronics.should_receive(:gem_installed?).with(gemdef('gem2', :version => '>=1.2.3')).and_return(false)
       gemtronics.should_receive(:gem_installed?).with(gemdef('gem3', :version => '4.5.6')).and_return(false)
       gemtronics.should_receive(:gem_installed?).with(gemdef('gem4')).and_return(true)
-      gemtronics.should_receive(:system).with('gem install gem3 --source=http://gems.rubyforge.org --version=4.5.6')
-      gemtronics.should_receive(:system).with('gem install gem2 --source=http://gems.rubyforge.org')
-      gemtronics.should_receive(:system).with('gem install gem1 --source=http://gems.example.org')
+      gemtronics.should_receive(:system).with('gem install gem3 --source=http://gems.rubyforge.org --no-ri --no-rdoc --version=4.5.6')
+      gemtronics.should_receive(:system).with('gem install gem2 --source=http://gems.rubyforge.org --no-ri --no-rdoc')
+      gemtronics.should_receive(:system).with('gem install gem1 --source=http://gems.example.org --no-ri --no-rdoc')
       gemtronics.group(:test) do |g|
         g.add('gem1', :source => 'http://gems.example.org')
         g.add('gem2', :version => '>=1.2.3')

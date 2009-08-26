@@ -44,10 +44,14 @@ describe Gemtronics::Definition do
     
     it 'should generate an install command string' do
       @gd.name = 'my_gem'
-      @gd.install_command.should == 'gem install my_gem --source=http://gems.rubyforge.org'
+      @gd.install_command.should == 'gem install my_gem --source=http://gems.rubyforge.org --no-ri --no-rdoc'
       @gd.version = '1.2.3'
-      @gd.install_command.should == 'gem install my_gem --source=http://gems.rubyforge.org --version=1.2.3'
+      @gd.install_command.should == 'gem install my_gem --source=http://gems.rubyforge.org --no-ri --no-rdoc --version=1.2.3'
       @gd.source = 'http://gems.example.org'
+      @gd.install_command.should == 'gem install my_gem --source=http://gems.example.org --no-ri --no-rdoc --version=1.2.3'
+      @gd.ri = true
+      @gd.install_command.should == 'gem install my_gem --source=http://gems.example.org --no-rdoc --version=1.2.3'
+      @gd.rdoc = true
       @gd.install_command.should == 'gem install my_gem --source=http://gems.example.org --version=1.2.3'
     end
     
@@ -97,6 +101,8 @@ describe Gemtronics::Definition do
   property(:version, '>=0.0.0')
   property(:source, 'http://gems.rubyforge.org')
   property(:load?, true, :load)
+  property(:ri?, false, :ri)
+  property(:rdoc?, false, :rdoc)
   
   describe 'require_list' do
     

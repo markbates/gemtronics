@@ -5,7 +5,7 @@ module Gemtronics
     # A Hash of the default options that are applied to all the gems.
     # These options can be overidden at both the group and the individual
     # gem level.
-    GLOBAL_DEFAULT_OPTIONS = {:load => true, :version => '>=0.0.0', :source => 'http://gems.rubyforge.org'}
+    GLOBAL_DEFAULT_OPTIONS = {:load => true, :version => '>=0.0.0', :source => 'http://gems.rubyforge.org', :ri => false, :rdoc => false}
     
     # A Hash of all the groups that have been defined.
     attr_accessor :groups

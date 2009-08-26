@@ -10,7 +10,7 @@ describe Gemtronics::Grouper do
       g.add('gem2')
     end
     group = gemtronics.groups[:test2]
-    group.gems.should == [{:source => "http://gems.rubyforge.org", :load => true, :version => ">=0.0.0", :require => ["gem1"], :name => "gem1"}, {:source => "http://gems.example.org", :load => true, :version => ">=0.0.0", :require => ["gem2"], :name => "gem2"}]
+    group.gems.should == [gemdef('gem1'), gemdef('gem2', :source => "http://gems.example.org")]
   end
   
   describe 'search' do
@@ -42,7 +42,7 @@ describe Gemtronics::Grouper do
       group = gemtronics.groups[:test]
       group.should be_kind_of(Gemtronics::Grouper)
       gm = group.gems.first
-      gm.should == {:source => "http://gems.rubyforge.org", :load => true, :version => ">=0.0.0", :require => ["gem1"], :name => "gem1"}
+      gm.should == gemdef('gem1')
     end
     
     it 'should inherit the groups options' do
@@ -53,7 +53,7 @@ describe Gemtronics::Grouper do
       group = gemtronics.groups[:test2]
       
       gm = group.gems.first
-      gm.should == {:source => "http://gems.example.org", :load => true, :version => ">=0.0.0", :require => ["gem2"], :name => "gem2"}
+      gm.should == gemdef('gem2', :source => "http://gems.example.org")
     end
     
     it 'should merge in the new definition if add is called again' do
@@ -63,14 +63,14 @@ describe Gemtronics::Grouper do
       group = gemtronics.groups[:test]
       group.gems.size.should == 1
       gm = group.gems.first
-      gm.should == {:source => "http://gems.rubyforge.org", :load => true, :version => "1.2.3", :require => ["gem1"], :name => "gem1"}
+      gm.should == gemdef('gem1', :version => '1.2.3')
       gemtronics.group(:test) do |g|
         g.add('gem1', :version => '3.2.1')
       end
       group = gemtronics.groups[:test]
       group.gems.size.should == 1
       gm = group.gems.first
-      gm.should == {:source => "http://gems.rubyforge.org", :load => true, :version => "3.2.1", :require => ["gem1"], :name => "gem1"}
+      gm.should == gemdef('gem1', :version => '3.2.1')
     end
     
     it 'should add the gem to the dependencies of the group' do
@@ -85,7 +85,7 @@ describe Gemtronics::Grouper do
       end
       group = gemtronics.groups[:grp2]
       group.gems.size.should == 3
-      group.gems[2].should == {:source => "http://gems.rubyforge.org", :load => true, :version => ">=0.0.0", :require => ["gem3"], :name => "gem3"}
+      group.gems[2].should == gemdef('gem3')
     end
     
   end
@@ -97,13 +97,13 @@ describe Gemtronics::Grouper do
         g.add('gem1')
         g.add('gem2')
       end
-      gemtronics.groups[:test].gems.should == [{:source => "http://gems.rubyforge.org", :load => true, :version => ">=0.0.0", :require => ["gem1"], :name => "gem1"}, {:source => "http://gems.rubyforge.org", :load => true, :version => ">=0.0.0", :require => ["gem2"], :name => "gem2"}]
+      gemtronics.groups[:test].gems.should == [gemdef('gem1'), gemdef('gem2')]
       
       gemtronics.group(:test) do |g|
         g.remove('gem1')
       end
       
-      gemtronics.groups[:test].gems.should == [{:source => "http://gems.rubyforge.org", :load => true, :version => ">=0.0.0", :require => ["gem2"], :name => "gem2"}]
+      gemtronics.groups[:test].gems.should == [gemdef('gem2')]
     end
     
   end
