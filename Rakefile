@@ -8,6 +8,8 @@ Gemstub.gem_spec do |s|
   s.rubyforge_project = 'magrathea'
   # s.add_dependency('')
   s.executables << 'gemtronics'
+  s.email = 'mark@markbates.com'
+  s.homepage = 'http://www.metabates.com'
 end
 
 Gemstub.rdoc do |rd|
