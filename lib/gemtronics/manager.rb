@@ -251,6 +251,7 @@ module Gemtronics
           group_list.each do |group_name|
             Gemtronics.require_gems(group_name)
           end
+          load_gems_without_gemtronics
         end
         alias_method :load_gems, :load_gems_with_gemtronics
       end
