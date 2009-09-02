@@ -46,7 +46,11 @@ group(:development, :dependencies => :default) do |g|
   
 end
 
-group(:test, :dependencies => :development) do |g|
+group(:test, :dependencies => :development, :load => false) do |g|
+  
+end
+
+group(:cucumber, :dependencies => :test) do |g|
   
 end
     }.strip
@@ -67,27 +71,41 @@ when 'convert'
   
   out_path = path.gsub('gems.yml', 'gemtronics.rb')
   File.open(out_path, 'w') do |f|
+    out = ''
+    
     unless top_options.empty?
-      f.puts "group(:default, #{top_options.inspect.gsub('=>', ' => ')}) do |g|"
+      out << "group(:default, #{top_options.inspect.gsub('=>', ' => ')}) do |g|\n"
     else
-      f.puts "group(:default) do |g|"
+      out << "group(:default) do |g|\n"
     end
   
     gems.each do |gemdef|
-      x = "  g.add('#{gemdef['name']}'"
+      out << "  g.add('#{gemdef['name']}'"
       options = {}
       options[:require] = gemdef['require_name'] if gemdef['require_name']
       options[:version] = gemdef['version'] if gemdef['version']
       options[:load] = false if gemdef['load'] == false
       unless options.empty?
-        x << ", #{options.inspect.gsub('=>', ' => ')})"
+        out << ", #{options.inspect.gsub('=>', ' => ')})\n"
       else
-        x << ')'
+        out << ")\n"
       end
-      f.puts x
     end
   
-    f.puts 'end'
+    out << "end\n"
+    out << %{
+
+alias_group :production, :default
+alias_group :development, :default
+
+group(:test, :dependencies => :development, :load => false) do |g|
+  
+end
+
+alias_group :cucumber, :test
+    }
+    
+    f.puts out.strip.gsub('{', '').gsub('}', '').gsub('"', '\'')
   end
   puts File.read(out_path)
 else

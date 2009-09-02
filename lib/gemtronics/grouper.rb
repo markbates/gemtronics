@@ -38,13 +38,12 @@ module Gemtronics
       self.gems = []
       self.dependents = []
       options = {} if options.nil?
+      deps = [options.delete(:dependencies)].flatten.compact
       self.group_options = Gemtronics::Manager::GLOBAL_DEFAULT_OPTIONS.merge(options)
-      deps = self.group_options.delete(:dependencies)
-      if deps
-        [deps].flatten.each do |dep|
-          self.dependency(dep)
-        end
+      deps.each do |dep|
+        self.dependency(dep)
       end
+      self.group_options.merge!(options)
       self
     end
     
@@ -136,6 +135,7 @@ module Gemtronics
     def dependency(name)
       group = Gemtronics::Manager.instance.groups[name.to_sym]
       if group
+        self.group_options.merge!(group.group_options)
         Gemtronics.group(name.to_sym).dependents << self.name
         group.gems.dup.each do |gemdef|
           self.add(gemdef.name, gemdef)

@@ -2,10 +2,38 @@ require File.dirname(__FILE__) + '/../spec_helper'
 
 describe Gemtronics::Manager do
   
-  describe 'find' do
+  describe 'alias_group' do
     
     before(:each) do
       gemtronics.group(:default) do |g|
+        g.add('gem1')
+      end
+      gemtronics.alias_group(:development, :default)
+      gemtronics.group(:test, :source => 'http://gems.github.com', :load => false, :dependencies => :development) do |g|
+        g.add('gem2')
+      end
+      gemtronics.alias_group(:cucumber, :test)
+    end
+    
+    it 'should inherit options from the aliased group' do
+      gemdef = gemtronics.find('gem1', :group => :default)
+      gemdef.source.should == 'http://gems.rubyforge.org'
+      gemdef = gemtronics.find('gem2', :group => :test)
+      gemdef.source.should == 'http://gems.github.com'
+      gemdef = gemtronics.find('gem1', :group => :test)
+      gemdef.source.should == 'http://gems.rubyforge.org'
+      gemdef = gemtronics.find('gem2', :group => :cucumber)
+      gemdef.source.should == 'http://gems.github.com'
+      gemdef = gemtronics.find('gem1', :group => :cucumber)
+      gemdef.source.should == 'http://gems.rubyforge.org'
+    end
+    
+  end
+  
+  describe 'find' do
+    
+    before(:each) do
+      gemtronics.group(:default, :source => 'http://gems.github.com') do |g|
         g.add('gem1')
       end
       gemtronics.group(:production, :dependencies => :default) do |g|
@@ -23,11 +51,15 @@ describe Gemtronics::Manager do
       RAILS_ENV = 'development'
       gemdef = gemtronics.find('gem2')
       gemdef.version.should == '4.5.6'
+      gemdef.source.should == 'http://gems.github.com'
       Object.send(:remove_const, 'RAILS_ENV')
     end
     
     it 'should find a gem definition by group name' do
-      gemtronics.find('gem2', :group => :development)
+      gemdef = gemtronics.find('gem2', :group => :development)
+      gemdef.version.should == '4.5.6'
+      gemdef = gemtronics.find('gem2', :group => :production)
+      gemdef.version.should == '1.2.3'
     end
     
     it 'should find the gem definition by group name before RAILS_ENV' do
