@@ -180,7 +180,7 @@ describe Gemtronics::Manager do
     
     before(:each) do
       RAILS_ENV = 'test'
-      RAILS_ROOT = File.join(File.dirname(__FILE__), '..', 'rails_root')      
+      RAILS_ROOT = File.join(File.dirname(__FILE__), '..', 'rails_root')
     end
     
     after(:each) do
@@ -200,6 +200,13 @@ describe Gemtronics::Manager do
       config.should_receive(:gem).with('gem7', :version => '>=1.2.3.4', :lib => false)
       config.should_receive(:gem).with('gem8', :source => 'http://gems.example.com')
       gemtronics.for_rails(config)
+    end
+    
+    it 'should just require the gems if no config is given' do
+      Rails::Initializer.should_receive(:alias_method).with(:load_gems_without_gemtronics, :load_gems)
+      Rails::Initializer.should_receive(:define_method).with(:load_gems_with_gemtronics)
+      Rails::Initializer.should_receive(:alias_method).with(:load_gems, :load_gems_with_gemtronics)
+      gemtronics.for_rails
     end
     
   end

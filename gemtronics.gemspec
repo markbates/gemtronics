@@ -2,11 +2,11 @@
 
 Gem::Specification.new do |s|
   s.name = %q{gemtronics}
-  s.version = "0.4.7.20090826163642"
+  s.version = "0.4.8.20090902114901"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["markbates"]
-  s.date = %q{2009-08-26}
+  s.date = %q{2009-09-02}
   s.default_executable = %q{gemtronics}
   s.description = %q{gemtronics was developed by: markbates}
   s.email = %q{}
@@ -16,7 +16,7 @@ Gem::Specification.new do |s|
   s.homepage = %q{}
   s.require_paths = ["lib"]
   s.rubyforge_project = %q{magrathea}
-  s.rubygems_version = %q{1.3.4}
+  s.rubygems_version = %q{1.3.5}
   s.summary = %q{gemtronics}
 
   if s.respond_to? :specification_version then

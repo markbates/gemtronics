@@ -208,13 +208,25 @@ module Gemtronics
       return res
     end
     
-    def for_rails(config, options = {})
+    def for_rails(config = nil, options = {})
       options = {:gemtronics_path => File.join(RAILS_ROOT, 'config', 'gemtronics.rb'),
                  :group => RAILS_ENV}.merge(options)
       [options.delete(:gemtronics_path)].flatten.each do |path|
         self.load(path)
       end
-      [options.delete(:group)].flatten.each do |group_name|
+      group_list = [options.delete(:group)].flatten
+      
+      if config.nil?
+        for_rails_without_config(group_list, options)
+      else
+        for_rails_with_config(group_list, config, options)
+      end
+      
+    end
+    
+    private
+    def for_rails_with_config(group_list, config, options = {})
+      group_list.each do |group_name|
         group = self.groups[group_name.to_sym]
         group.gems.each do |gemdef|
           gemdef.require_list.each do |lib|
@@ -233,7 +245,18 @@ module Gemtronics
       end
     end
     
-    private
+    def for_rails_without_config(group_list, options = {})
+      Rails::Initializer.class_eval do
+        alias_method :load_gems_without_gemtronics, :load_gems
+        define_method(:load_gems_with_gemtronics) do
+          group_list.each do |group_name|
+            Gemtronics.require_gems(group_name)
+          end
+        end
+        alias_method :load_gems, :load_gems_with_gemtronics
+      end
+    end
+    
     def gem_installed?(gemdef) # :nodoc:
       return true if self.installed_gems.include?(gemdef.to_s)
       return gemdef.installed?

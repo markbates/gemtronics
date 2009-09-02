@@ -44,4 +44,10 @@ def gemdef(name, options = {})
 end
 
 module Rails
+  class Initializer
+    
+    def load_gems
+    end
+    
+  end
 end
