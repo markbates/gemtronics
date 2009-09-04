@@ -2,7 +2,7 @@
 
 Gem::Specification.new do |s|
   s.name = %q{gemtronics}
-  s.version = "0.5.2.20090904162539"
+  s.version = "0.5.3.20090904163224"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["markbates"]

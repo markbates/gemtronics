@@ -26,6 +26,10 @@ when 'install'
   path = ARGV[2] || File.join('config', 'gemtronics.rb')
   Gemtronics.load(path)
   Gemtronics.install_gems(ARGV[1] || 'everything!')
+when 'restore'
+  path = ARGV[1] || 'system_gemtronics_dump.rb'
+  Gemtronics.load(path)
+  Gemtronics.install_gems('everything!')
 when 'dump'
   gem_list = `gem list`
 
@@ -50,13 +54,13 @@ when 'dump'
   groups.each_with_index do |gems, i|
     out << "group(:group_#{i}) do |g|\n"
     gems.each do |name, gemdef|
-      out << "  g.add('#{name}', :version => #{gemdef[:version]})\n"
+      out << "  g.add('#{name}', :version => '#{gemdef[:version]}')\n"
     end
     out << "end\n"
   end
 
   puts out
-  File.open('system_gemtronics.rb', 'w') {|f| f.write out}
+  File.open('system_gemtronics_dump.rb', 'w') {|f| f.write out}
 when 'generate'
   path = ARGV[1] || 'config'
   FileUtils.mkdir_p(path)

@@ -4,7 +4,7 @@ require 'gemstub'
 Gemstub.test_framework = :rspec
 
 Gemstub.gem_spec do |s|
-  s.version = "0.5.2"
+  s.version = "0.5.3"
   s.rubyforge_project = 'magrathea'
   # s.add_dependency('')
   s.executables << 'gemtronics'
