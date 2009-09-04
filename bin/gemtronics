@@ -26,6 +26,37 @@ when 'install'
   path = ARGV[2] || File.join('config', 'gemtronics.rb')
   Gemtronics.load(path)
   Gemtronics.install_gems(ARGV[1] || 'everything!')
+when 'dump'
+  gem_list = `gem list`
+
+  gems = {}
+
+  gem_list.each do |line|
+    defs = line.scan(/([^\s\(\)\,]+)/).flatten
+    gems[defs.first] = defs[1..defs.size]
+  end
+
+  groups = []
+
+  gems.each do |name, versions|
+    versions.each_with_index do |version, i|
+      groups[i] ||= {}
+      groups[i][name] = {:name => name, :version => version}
+    end
+  end
+
+  out = ''
+
+  groups.each_with_index do |gems, i|
+    out << "group(:group_#{i}) do |g|\n"
+    gems.each do |name, gemdef|
+      out << "  g.add('#{name}', :version => #{gemdef[:version]})\n"
+    end
+    out << "end\n"
+  end
+
+  puts out
+  File.open('system_gemtronics.rb', 'w') {|f| f.write out}
 when 'generate'
   path = ARGV[1] || 'config'
   FileUtils.mkdir_p(path)

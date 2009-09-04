@@ -59,7 +59,12 @@ module Gemtronics
     #   gd.version = '2.3.0'
     #   gd.install_command #=> 'gem install configatron --source=http://gems.rubyforge.org --version=2.3.0'
     def install_command
-      cmd = "gem install #{self.name} --source=#{self.source}"
+      cmd = "gem install #{self.name}"
+      
+      if self.source
+        cmd << " --source=#{self.source}"
+      end
+      
       unless self.ri?
         cmd << ' --no-ri'
       end
@@ -121,7 +126,7 @@ module Gemtronics
     
     build_method(:name)
     build_method(:version, '>=0.0.0')
-    build_method(:source, 'http://gems.rubyforge.org')
+    build_method(:source, nil)
     build_method(:load?, true, :load)
     build_method(:ri?, false, :ri)
     build_method(:rdoc?, false, :rdoc)

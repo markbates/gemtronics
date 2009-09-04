@@ -10,7 +10,7 @@ describe Gemtronics::Grouper do
       g.add('gem2')
     end
     group = gemtronics.groups[:test2]
-    group.gems.should == [gemdef('gem1'), gemdef('gem2', :source => "http://gems.example.org")]
+    group.gems.should == [gemdef('gem1', :source => 'http://gems.example.org'), gemdef('gem2', :source => "http://gems.example.org")]
   end
   
   describe 'search' do

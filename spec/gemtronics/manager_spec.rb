@@ -9,7 +9,7 @@ describe Gemtronics::Manager do
         g.add('gem1')
       end
       gemtronics.alias_group(:development, :default)
-      gemtronics.group(:test, :source => 'http://gems.github.com', :load => false, :dependencies => :development) do |g|
+      gemtronics.group(:test, :version => '1.2.3', :load => false, :dependencies => :development) do |g|
         g.add('gem2')
       end
       gemtronics.alias_group(:cucumber, :test)
@@ -17,15 +17,15 @@ describe Gemtronics::Manager do
     
     it 'should inherit options from the aliased group' do
       gemdef = gemtronics.find('gem1', :group => :default)
-      gemdef.source.should == 'http://gems.rubyforge.org'
+      gemdef.version.should == '>=0.0.0'
       gemdef = gemtronics.find('gem2', :group => :test)
-      gemdef.source.should == 'http://gems.github.com'
+      gemdef.version.should == '1.2.3'
       gemdef = gemtronics.find('gem1', :group => :test)
-      gemdef.source.should == 'http://gems.rubyforge.org'
+      gemdef.version.should == '>=0.0.0'
       gemdef = gemtronics.find('gem2', :group => :cucumber)
-      gemdef.source.should == 'http://gems.github.com'
+      gemdef.version.should == '1.2.3'
       gemdef = gemtronics.find('gem1', :group => :cucumber)
-      gemdef.source.should == 'http://gems.rubyforge.org'
+      gemdef.version.should == '>=0.0.0'
     end
     
   end
@@ -139,8 +139,8 @@ describe Gemtronics::Manager do
   describe 'install_gems' do
     
     it 'should install the gems' do
-      gemtronics.should_receive(:system).with('gem install gem3 --source=http://gems.rubyforge.org --no-ri --no-rdoc --version=4.5.6')
-      gemtronics.should_receive(:system).with('gem install gem2 --source=http://gems.rubyforge.org --no-ri --no-rdoc')
+      gemtronics.should_receive(:system).with('gem install gem3 --no-ri --no-rdoc --version=4.5.6')
+      gemtronics.should_receive(:system).with('gem install gem2 --no-ri --no-rdoc')
       gemtronics.should_receive(:system).with('gem install gem1 --source=http://gems.example.org --no-ri --no-rdoc')
       gemtronics.group(:test) do |g|
         g.add('gem1', :source => 'http://gems.example.org')
@@ -155,8 +155,8 @@ describe Gemtronics::Manager do
       gemtronics.should_receive(:gem_installed?).with(gemdef('gem2', :version => '>=1.2.3')).and_return(false)
       gemtronics.should_receive(:gem_installed?).with(gemdef('gem3', :version => '4.5.6')).and_return(false)
       gemtronics.should_receive(:gem_installed?).with(gemdef('gem4')).and_return(true)
-      gemtronics.should_receive(:system).with('gem install gem3 --source=http://gems.rubyforge.org --no-ri --no-rdoc --version=4.5.6')
-      gemtronics.should_receive(:system).with('gem install gem2 --source=http://gems.rubyforge.org --no-ri --no-rdoc')
+      gemtronics.should_receive(:system).with('gem install gem3 --no-ri --no-rdoc --version=4.5.6')
+      gemtronics.should_receive(:system).with('gem install gem2 --no-ri --no-rdoc')
       gemtronics.should_receive(:system).with('gem install gem1 --source=http://gems.example.org --no-ri --no-rdoc')
       gemtronics.group(:test) do |g|
         g.add('gem1', :source => 'http://gems.example.org')
@@ -217,19 +217,19 @@ describe Gemtronics::Manager do
     
     after(:each) do
       Object.send(:remove_const, 'RAILS_ENV')
-      Object.send(:remove_const, 'RAILS_ROOT')      
+      Object.send(:remove_const, 'RAILS_ROOT')
     end
     
     it 'should call the config.gem method correctly' do
       config = mock('Rails.configuration')
-      config.should_receive(:gem).with("gem6", :lib => false)
-      config.should_receive(:gem).with('gem4', :lib => 'gem-four')
-      config.should_receive(:gem).with('gem1')
-      config.should_receive(:gem).with('gem2', :version => '1.2.3')
+      config.should_receive(:gem).with('gem1', :source => 'http://gems.example.com')
+      config.should_receive(:gem).with("gem6", :lib => false, :source => 'http://gems.example.com')
+      config.should_receive(:gem).with('gem4', :lib => 'gem-four', :source => 'http://gems.example.com')
+      config.should_receive(:gem).with('gem2', :version => '1.2.3', :source => 'http://gems.example.com')
       config.should_receive(:gem).with('gem3', :source => 'http://gems.github.com')
-      config.should_receive(:gem).with('gem5', :lib => 'gemfive')
-      config.should_receive(:gem).with('gem5', :lib => 'gem-five')
-      config.should_receive(:gem).with('gem7', :version => '>=1.2.3.4', :lib => false)
+      config.should_receive(:gem).with('gem5', :lib => 'gemfive', :source => 'http://gems.example.com')
+      config.should_receive(:gem).with('gem5', :lib => 'gem-five', :source => 'http://gems.example.com')
+      config.should_receive(:gem).with('gem7', :version => '>=1.2.3.4', :lib => false, :source => 'http://gems.example.com')
       config.should_receive(:gem).with('gem8', :source => 'http://gems.example.com')
       gemtronics.for_rails(config)
     end
