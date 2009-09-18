@@ -22,6 +22,30 @@ require 'fileutils'
 require 'yaml'
 
 case command
+when 'outdated', 'outdated?'
+  require 'benchmark'
+  path = ARGV[1] || File.join('config', 'gemtronics.rb')
+  Gemtronics.load(path)
+  puts "Please wait while we check the versions of your gems (This may take a few minutes)\n"
+  list = {}
+  elapsed = Benchmark.realtime {
+    list = Gemtronics.find_out_of_date_gems(true)
+  }
+  if list.empty?
+    puts ''
+    puts 'All of your gems are up to date!'
+    puts ''
+  else
+    puts ''
+    puts "There are #{list.size} out of date gem(s)."
+    puts ''
+    list.each do |gemdef|
+      puts "#{gemdef.name}\n\t#{gemdef.version} --> #{gemdef.update_version}"
+    end
+    puts ''
+  end
+  puts "-------------"
+  puts "Completed in #{elapsed} seconds."
 when 'install'
   path = ARGV[2] || File.join('config', 'gemtronics.rb')
   Gemtronics.load(path)

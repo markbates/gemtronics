@@ -6,6 +6,48 @@ describe Gemtronics::Definition do
     @gd = Gemtronics::Definition.new
   end
   
+  describe '<=>' do
+    
+    it 'should sort' do
+      list = [gemdef('gem4', :version => '7.8.9', :update_version => '9.8.7'), 
+              gemdef('gem2', :version => '1.2.3', :update_version => '3.2.1')]
+      list.sort!
+      list[0].should == gemdef('gem2', :version => '1.2.3', :update_version => '3.2.1')
+      list[1].should == gemdef('gem4', :version => '7.8.9', :update_version => '9.8.7')
+    end
+    
+  end
+  
+  describe 'has_update?' do
+    
+    it 'should return true/false if there is an update available' do
+      @gd.name = 'gem1'
+      @gd.version = '1.2.3'
+      @gd.should_receive(:'`').with('gem list --remote ^gem1$').and_return(%{
+*** REMOTE GEMS ***
+gem1 (2.3.4, 9.9.9)})
+      @gd.should have_update
+      @gd.update_version.should == '2.3.4'
+      
+      @gd.should_receive(:'`').with('gem list --remote ^gem1$').and_return(%{
+*** REMOTE GEMS ***
+gem1 (1.2.3)})
+      @gd.should_not have_update
+      
+      @gd.should_receive(:'`').with('gem list --remote ^gem1$').and_return(%{
+*** REMOTE GEMS ***
+gem1 (1.2.1)})
+      @gd.should_not have_update
+    end
+    
+    it 'should return false if there is an error' do
+      @gd.name = 'gem1'
+      @gd.version = '1.2.3'
+      @gd.should_not have_update
+    end
+    
+  end
+  
   describe 'load_gem' do
     
     it 'should load the gem' do

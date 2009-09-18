@@ -2,6 +2,33 @@ require File.dirname(__FILE__) + '/../spec_helper'
 
 describe Gemtronics::Manager do
   
+  describe 'find_out_of_date_gems' do
+    
+    it 'should return a list of outdated gems' do
+      gemtronics.group(:default) do |g|
+        g.add('gem1')
+      end
+      gemtronics.group(:production, :dependencies => :default) do |g|
+        g.add('gem2', :version => '1.2.3')
+      end
+      gemtronics.group(:development, :dependencies => :default) do |g|
+        g.add('gem3', :version => '4.5.6')
+      end
+      gemtronics.group(:test, :dependencies => :development) do |g|
+        g.add('gem4', :version => '7.8.9')
+      end
+      gemtronics.find('gem1').should_receive(:has_update?).and_return(false)
+      gemtronics.find('gem2').should_receive(:has_update?).and_return(gemdef('gem2', :version => '1.2.3', :update_version => '3.2.1'))
+      gemtronics.find('gem3').should_receive(:has_update?).and_return(false)
+      gemtronics.find('gem4').should_receive(:has_update?).and_return(gemdef('gem4', :version => '7.8.9', :update_version => '9.8.7'))
+      list = gemtronics.find_out_of_date_gems
+      list.size.should == 2
+      list[0].should == gemdef('gem2', :version => '1.2.3', :update_version => '3.2.1')
+      list[1].should == gemdef('gem4', :version => '7.8.9', :update_version => '9.8.7')
+    end
+    
+  end
+  
   describe 'alias_group' do
     
     before(:each) do

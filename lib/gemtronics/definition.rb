@@ -9,6 +9,8 @@ module Gemtronics
     # Get/set the source of the gem. Defaults to <tt>http://gems.rubyforge.org</tt>
     attr_accessor :source
     
+    attr_accessor :update_version # :nodoc:
+    
     # Returns true/false if the gem should be required. Defaults to <tt>true</tt>.
     def load?
       # method built dynamically. This is just a stub for RDoc.
@@ -111,6 +113,23 @@ module Gemtronics
         puts "require #{f}" if options[:verbose]
         require f
       end
+    end
+    
+    def has_update?
+      cmd = "gem list --remote ^#{self.name}$"
+      res = `#{cmd}`
+      return false unless res.is_a?(String)
+      res.match(/^#{self.name}\s\(([\d\.]+)/)
+      ext_v = $1
+      return false if ext_v.nil?
+      self.version.match(/[^\d]{0,2}(.+)$/)
+      v = $1
+      self.update_version = ext_v
+      return ext_v > v ? self : false
+    end
+    
+    def <=>(other)
+      "#{self.name}-#{self.version}" <=> "#{other.name}-#{other.version}"
     end
     
     private

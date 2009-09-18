@@ -207,6 +207,28 @@ module Gemtronics
       return res
     end
     
+    def find_out_of_date_gems(indicate = false)
+      tested = []
+      outdated = []
+      self.groups.each do |name, group|
+        group.gems.each do |g|
+          unless tested.include?("#{g.name}-#{g.version}")
+            if indicate
+              $stdout.write('.')
+              $stdout.flush
+            end
+            v = g.has_update?
+            # puts "!!!#{g.name} #{v}"
+            if v
+              outdated << v
+            end
+            tested << "#{g.name}-#{g.version}"
+          end
+        end
+      end
+      return outdated.sort
+    end
+    
     def for_rails(config = nil, options = {})
       options = {:gemtronics_path => File.join(RAILS_ROOT, 'config', 'gemtronics.rb'),
                  :group => RAILS_ENV}.merge(options)
