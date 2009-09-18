@@ -129,7 +129,7 @@ module Gemtronics
     end
     
     def <=>(other)
-      "#{self.name}-#{self.version}" <=> "#{other.name}-#{other.version}"
+      "#{self.name.downcase}-#{self.version}" <=> "#{other.name.downcase}-#{other.version}"
     end
     
     private
