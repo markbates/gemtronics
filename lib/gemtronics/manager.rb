@@ -48,19 +48,18 @@ module Gemtronics
     def warp_drive(name, options = {})
       options = {:load => false}.merge(options)
       group(:warp_drives) {|g| g.add(name, options)}
-      if defined?(RAILS_ENV)
-        group(RAILS_ENV.to_sym) {|g| g.add(name, options)}
-      end
       begin
-        find_and_require_gem(name)
+        g = find(name, :group => :warp_drives)
+        g.require_gem
         load(WarpDrive::Path.config.gemtronics.rb)
       rescue Exception => e
         if e.message.match(/Could not find RubyGem #{name}/)
-          cmd = find(name).install_command
+          g = find(name, :group => :warp_drives)
+          cmd = g.install_command
           puts cmd
           system cmd
           Gem.clear_paths
-          find_and_require_gem(name)
+          g.require_gem
           load(WarpDrive::Path.config.gemtronics.rb)
         end
       end
