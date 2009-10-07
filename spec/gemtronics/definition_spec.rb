@@ -12,8 +12,8 @@ describe Gemtronics::Definition do
       list = [gemdef('gem4', :version => '7.8.9', :update_version => '9.8.7'), 
               gemdef('Gem2', :version => '1.2.3', :update_version => '3.2.1')]
       list.sort!
-      list[0].should == gemdef('gem2', :version => '1.2.3', :update_version => '3.2.1')
-      list[1].should == gemdef('Gem4', :version => '7.8.9', :update_version => '9.8.7')
+      list[0].should == gemdef('Gem2', :version => '1.2.3', :update_version => '3.2.1')
+      list[1].should == gemdef('gem4', :version => '7.8.9', :update_version => '9.8.7')
     end
     
   end

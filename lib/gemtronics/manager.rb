@@ -36,6 +36,33 @@ module Gemtronics
       end
     end
     
+    # Adds support for WarpDrives within Gemtronics:
+    # 
+    # Example:
+    #   warp_drive('authenticator', :version => '1.0.1')
+    # 
+    # This will add the WarpDrive gem to the list, and then
+    # load the WarpDrive's gemtronics file.
+    # 
+    # http://github.com/markbates/warp_drive
+    def warp_drive(name, options = {})
+      options = {:load => false}.merge(options)
+      group(:warp_drives) {|g| g.add(name, options)}
+      begin
+        find_and_require_gem(name)
+        load(WarpDrive::Path.config.gemtronics.rb)
+      rescue Exception => e
+        if e.message.match(/Could not find RubyGem #{name}/)
+          cmd = find(name).install_command
+          puts cmd
+          system cmd
+          Gem.clear_paths
+          find_and_require_gem(name)
+          load(WarpDrive::Path.config.gemtronics.rb)
+        end
+      end
+    end
+    
     # Aliases one gem group to another group.
     # 
     # Example:
