@@ -48,6 +48,9 @@ module Gemtronics
     def warp_drive(name, options = {})
       options = {:load => false}.merge(options)
       group(:warp_drives) {|g| g.add(name, options)}
+      if defined?(RAILS_ENV)
+        group(RAILS_ENV.to_sym) {|g| g.add(name, options)}
+      end
       begin
         find_and_require_gem(name)
         load(WarpDrive::Path.config.gemtronics.rb)
